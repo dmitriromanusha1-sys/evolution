@@ -110,7 +110,7 @@ let comboTimeout = 2000;
 let comboBonus = 0;
 
 // Ускоренная стрельба
-let rapidFireActive = false;
+let rapidFireActive = true;
 let rapidFireTimer = 0;
 let rapidFireDuration = 0;
 const MAX_RAPID_FIRE = 3000;
@@ -1147,16 +1147,7 @@ function update() {
         }
     }
     
-    if (rapidFireActive) {
-        rapidFireTimer += 16;
-        const percent = ((rapidFireDuration - rapidFireTimer) / MAX_RAPID_FIRE) * 100;
-        document.getElementById('rapid-fire-fill').style.width = `${Math.max(0, percent)}%`;
-        
-        if (rapidFireTimer >= rapidFireDuration) {
-            rapidFireActive = false;
-            document.getElementById('rapid-fire-indicator').style.display = 'none';
-        }
-    }
+    // rapidFire всегда активна — таймер не нужен
     
     const now = Date.now();
     if (now - lastKillTime > comboTimeout && combo > 0) {
@@ -2054,9 +2045,8 @@ function restartGame() {
     lastKillTime = 0;
     
     autoShootActive = false;
-    rapidFireActive = false;
+    rapidFireActive = true;
     rapidFireTimer = 0;
-    document.getElementById('rapid-fire-indicator').style.display = 'none';
     
     damageTexts = [];
     rewardTexts = [];
@@ -2211,7 +2201,7 @@ canvas.addEventListener('mouseleave', () => {
 
 canvas.addEventListener('contextmenu', (e) => {
     e.preventDefault();
-    if (!gameOver && !gameWin && !gamePaused) activateRapidFire();
+    if (!gameOver && !gameWin && !gamePaused) upgradeWeapon();
 });
 
 // Модальные окна
