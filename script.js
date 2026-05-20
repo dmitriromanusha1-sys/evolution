@@ -29,9 +29,26 @@ let gameWidth, gameHeight;
 const mapImage = new Image();
 mapImage.src = 'assept/map.png';
 
-// Спрайт игрока
+// Спрайт игрока с удалением зелёного фона (chroma key)
 const playerImage = new Image();
 playerImage.src = 'assept/player.png';
+let playerImageClean = null;
+playerImage.onload = () => {
+    const oc = document.createElement('canvas');
+    oc.width = playerImage.naturalWidth;
+    oc.height = playerImage.naturalHeight;
+    const ox = oc.getContext('2d');
+    ox.drawImage(playerImage, 0, 0);
+    const id = ox.getImageData(0, 0, oc.width, oc.height);
+    const d = id.data;
+    for (let i = 0; i < d.length; i += 4) {
+        const r = d[i], g = d[i+1], b = d[i+2];
+        // Убираем зелёный фон: G явно доминирует над R и B
+        if (g > 100 && g > r * 1.4 && g > b * 1.4) d[i+3] = 0;
+    }
+    ox.putImageData(id, 0, 0);
+    playerImageClean = oc;
+};
 
 // Спрайты врагов [Ближник, Дальник, Танк, Целитель, Босс]
 const enemySprites = [];
@@ -1349,22 +1366,22 @@ function update() {
                 enemy.x -= (dx / distance) * enemy.speed;
                 enemy.y -= (dy / distance) * enemy.speed;
             }
-            // Лечит соседей
+            // Лечит соседей (не боссов)
             if (enemy.healCooldown <= 0) {
                 let healed = 0;
                 for (const other of enemies) {
-                    if (other === enemy) continue;
+                    if (other === enemy || other.isBoss) continue;
                     const odx = (other.x + other.width/2) - ex;
                     const ody = (other.y + other.height/2) - ey;
                     const odist = Math.sqrt(odx*odx + ody*ody);
                     if (odist < 180 && other.health < other.maxHealth) {
-                        const healAmt = Math.floor(other.maxHealth * 0.12);
+                        const healAmt = Math.floor(other.maxHealth * 0.04);
                         other.health = Math.min(other.maxHealth, other.health + healAmt);
                         createRewardText(other.x + other.width/2, other.y - 5, `+${healAmt}❤`);
                         healed++;
                     }
                 }
-                enemy.healCooldown = 2500;
+                enemy.healCooldown = 4500;
             }
         }
 
@@ -1631,7 +1648,9 @@ function draw() {
     const cx = player.x + player.width / 2;
     const cy = player.y + player.height / 2;
 
-    if (playerImage.complete && playerImage.naturalWidth > 0) {
+    if (playerImageClean) {
+        ctx.drawImage(playerImageClean, player.x, player.y, player.width, player.height);
+    } else if (playerImage.complete && playerImage.naturalWidth > 0) {
         ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
     } else {
         ctx.fillStyle = '#00cc44';
