@@ -972,7 +972,7 @@ function shoot(targetX, targetY) {
     const stats = getWeaponStats();
     
     const fireRateMultiplier = rapidFireActive ? 3.0 : 1.0;
-    const timeBetweenShots = 1000 / (stats.fireRate * fireRateMultiplier * 0.7);
+    const timeBetweenShots = 1000 / (stats.fireRate * fireRateMultiplier * 0.77);
     
     if (now - lastShotTime >= timeBetweenShots) {
         const dx = targetX - (player.x + player.width / 2);
