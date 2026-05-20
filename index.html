@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Эволюция оружия</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Уведомления -->
+    <div id="notification"></div>
+    <div id="achievements-container"></div>
+
+    <!-- Комбо -->
+    <div id="combo-display" class="combo-display">
+        <div id="combo-count" class="combo-count">COMBO x1</div>
+        <div id="combo-multiplier" class="combo-multiplier">Множитель: x1.0</div>
+    </div>
+
+    <!-- ВЫБОР РЕЖИМА -->
+    <div id="mode-select-screen">
+        <div class="mode-select-card">
+            <div class="tutorial-title">ВЫБОР РЕЖИМА</div>
+            <div class="mode-list">
+                <button class="mode-option" id="mode-normal-btn">
+                    <div class="mode-icon">⚔️</div>
+                    <div class="mode-info">
+                        <div class="mode-name">НОРМАЛЬНЫЙ</div>
+                        <div class="mode-desc">Пройди 8 волн и прокачай все оружия до максимума. Классическое прохождение.</div>
+                    </div>
+                </button>
+                <button class="mode-option" id="mode-endless-btn">
+                    <div class="mode-icon">♾️</div>
+                    <div class="mode-info">
+                        <div class="mode-name">БЕСКОНЕЧНЫЙ</div>
+                        <div class="mode-desc">Волны не заканчиваются. Враги становятся сильнее с каждой волной. Выживи как можно дольше.</div>
+                    </div>
+                </button>
+            </div>
+            <button class="menu-btn secondary" id="mode-back-btn">← НАЗАД</button>
+        </div>
+    </div>
+
+    <!-- ПОДСКАЗКА УПРАВЛЕНИЯ (перед началом игры) -->
+    <div id="tutorial-screen">
+        <div class="tutorial-card">
+            <div class="tutorial-title">КАК ИГРАТЬ</div>
+            <div class="tutorial-grid">
+                <div class="tutorial-item">
+                    <div class="tutorial-key">WASD</div>
+                    <div class="tutorial-desc">Движение персонажа</div>
+                </div>
+                <div class="tutorial-item">
+                    <div class="tutorial-key">ЛКМ</div>
+                    <div class="tutorial-desc">Стрельба (удерживать)</div>
+                </div>
+                <div class="tutorial-item">
+                    <div class="tutorial-key">ПКМ</div>
+                    <div class="tutorial-desc">Ускоренная стрельба</div>
+                </div>
+                <div class="tutorial-item">
+                    <div class="tutorial-key">Q</div>
+                    <div class="tutorial-desc">Улучшить оружие</div>
+                </div>
+                <div class="tutorial-item">
+                    <div class="tutorial-key">P / ESC</div>
+                    <div class="tutorial-desc">Пауза</div>
+                </div>
+                <div class="tutorial-item">
+                    <div class="tutorial-key">R</div>
+                    <div class="tutorial-desc">Заново (из паузы)</div>
+                </div>
+            </div>
+            <div class="tutorial-enemies">
+                <div class="tutorial-section-title">ТИПЫ ВРАГОВ</div>
+                <div class="tutorial-enemy-list">
+                    <div class="tutorial-enemy"><span class="enemy-dot" style="background:#ff6600"></span><b>Ближник</b> — быстро атакует в упор</div>
+                    <div class="tutorial-enemy"><span class="enemy-dot" style="background:#00aaff"></span><b>Дальник</b> — стреляет с расстояния</div>
+                    <div class="tutorial-enemy"><span class="enemy-dot" style="background:#9944ff"></span><b>Танк</b> — много HP, медленный</div>
+                    <div class="tutorial-enemy"><span class="enemy-dot" style="background:#00dd77"></span><b>Целитель</b> — лечит союзников</div>
+                    <div class="tutorial-enemy"><span class="enemy-dot" style="background:#ffcc00"></span><b>Босс</b> — появляется раз в 5 волн</div>
+                </div>
+            </div>
+            <button class="menu-btn primary" id="tutorial-start-btn">НАЧАТЬ ИГРУ →</button>
+        </div>
+    </div>
+
+    <!-- ГЛАВНОЕ МЕНЮ -->
+    <div id="main-menu">
+        <div class="menu-logo">
+            <div class="menu-logo-title">ЭВОЛЮЦИЯ</div>
+            <div class="menu-logo-subtitle">ОРУЖИЯ</div>
+        </div>
+        <div class="menu-buttons">
+            <button class="menu-btn primary" id="new-game-menu-btn">НОВАЯ ИГРА</button>
+            <button class="menu-btn secondary" id="settings-menu-btn">НАСТРОЙКИ</button>
+        </div>
+    </div>
+
+    <!-- НАСТРОЙКИ -->
+    <div id="settings-menu">
+        <div class="settings-tabs">
+            <button class="settings-tab active" data-stab="general">Общие</button>
+            <button class="settings-tab" data-stab="controls">Управление</button>
+        </div>
+
+        <div id="stab-general" class="settings-tab-content active">
+            <div class="settings-group">
+                <label class="settings-label">Музыка</label>
+                <div class="toggle-row">
+                    <button class="toggle-btn active" id="toggle-music">ВКЛ</button>
+                </div>
+                <input class="settings-slider" type="range" id="music-volume" min="0" max="100" value="50">
+            </div>
+            <div class="settings-group">
+                <label class="settings-label">Показывать комбо</label>
+                <div class="toggle-row">
+                    <button class="toggle-btn active" id="toggle-combo">ВКЛ</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="stab-controls" class="settings-tab-content">
+            <div class="controls-table">
+                <div class="ctrl-row"><kbd>WASD</kbd><span>Движение персонажа</span></div>
+                <div class="ctrl-row"><kbd>ЛКМ</kbd><span>Стрельба (удерживать)</span></div>
+                <div class="ctrl-row"><kbd>Пробел</kbd><span>Одиночный выстрел</span></div>
+                <div class="ctrl-row"><kbd>Q</kbd><span>Улучшить оружие</span></div>
+                <div class="ctrl-row"><kbd>ПКМ / Shift</kbd><span>Ускоренная стрельба</span></div>
+                <div class="ctrl-row"><kbd>P / Esc</kbd><span>Пауза / Меню</span></div>
+                <div class="ctrl-row"><kbd>R</kbd><span>Заново (из паузы)</span></div>
+                <div class="ctrl-row"><kbd>F11</kbd><span>Полноэкранный режим</span></div>
+            </div>
+        </div>
+
+        <button class="menu-btn secondary" id="settings-back-btn">← НАЗАД</button>
+    </div>
+
+    <!-- ИГРА -->
+    <div id="game-container" class="hidden">
+
+        <!-- Канвас -->
+        <div id="canvas-container">
+            <canvas id="game-canvas"></canvas>
+
+            <!-- HP игрока (верхний левый угол) -->
+            <div id="player-hp-hud">
+                <div id="player-hp-bar-bg">
+                    <div id="player-hp-bar-fill"></div>
+                    <span id="player-hp-text">100/100</span>
+                </div>
+            </div>
+
+            <!-- Быстрые кнопки (верхний правый угол) -->
+            <div id="quick-btns">
+                <button class="quick-btn" id="qbtn-stats" title="Статистика (P)">📊</button>
+                <button class="quick-btn" id="qbtn-upgrades" title="Улучшения (P)">⚙️</button>
+                <button class="quick-btn" id="qbtn-skills" title="Навыки (P)">⭐</button>
+                <button class="quick-btn" id="qbtn-missions" title="Миссии (P)">📋</button>
+            </div>
+
+            <!-- Прогресс волны (вверху по центру) -->
+            <div id="wave-progress">
+                <div id="wave-progress-text">Волна 1: 0/10</div>
+                <div id="wave-progress-bar"><div id="wave-progress-fill"></div></div>
+            </div>
+
+            <!-- Статистика волны -->
+            <div id="wave-stats">
+                <div>Волна завершена!</div>
+                <div>Убито: <span id="wave-kills">0</span></div>
+                <div>Награда: $<span id="wave-reward">0</span></div>
+            </div>
+
+            <!-- Эффект эволюции -->
+            <div id="weapon-evolution" class="weapon-evolution"></div>
+
+            <!-- Ускоренная стрельба -->
+            <div id="rapid-fire-indicator" class="rapid-fire-indicator">
+                <div id="rapid-fire-fill" class="rapid-fire-fill"></div>
+            </div>
+
+            <!-- ПАУЗА -->
+            <div id="pause-menu">
+                <div class="pause-title">ПАУЗА</div>
+                <div class="pause-nav">
+                    <button class="pause-nav-btn" id="pause-stats-btn">
+                        <span class="pause-nav-icon">📊</span>
+                        <span>Статистика</span>
+                    </button>
+                    <button class="pause-nav-btn" id="pause-upgrades-btn">
+                        <span class="pause-nav-icon">⚙️</span>
+                        <span>Улучшения</span>
+                    </button>
+                    <button class="pause-nav-btn" id="pause-skills-btn">
+                        <span class="pause-nav-icon">⭐</span>
+                        <span>Навыки</span>
+                    </button>
+                    <button class="pause-nav-btn" id="pause-missions-btn">
+                        <span class="pause-nav-icon">📋</span>
+                        <span>Миссии</span>
+                    </button>
+                </div>
+                <div class="pause-actions">
+                    <button class="pause-action-btn primary" id="resume-btn">▶ Продолжить</button>
+                    <button class="pause-action-btn" id="restart-pause-btn">↺ Заново</button>
+                    <button class="pause-action-btn" id="change-mode-btn">⌂ Меню</button>
+                    <button class="pause-action-btn" onclick="toggleFullscreen()">⛶ Экран</button>
+                </div>
+            </div>
+
+            <!-- МОДАЛЬНЫЕ ОКНА -->
+
+            <!-- Статистика -->
+            <div id="modal-stats" class="modal hidden">
+                <div class="modal-box">
+                    <div class="modal-header">
+                        <span>СТАТИСТИКА</span>
+                        <button class="modal-close" data-modal="modal-stats">✕</button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="current-weapon" class="weapon-card">
+                            <div class="weapon-icon" id="weapon-icon">🏹</div>
+                            <div id="weapon-info">
+                                <div class="stat-label">Оружие</div>
+                                <div class="stat-value" id="weapon-name">Лук</div>
+                                <div class="stat-label" style="margin-top:4px">Уровень</div>
+                                <div class="stat-value" id="weapon-level">1/8</div>
+                            </div>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-card"><div class="stat-label">Уровень</div><div class="stat-value" id="player-level">1</div><div class="progress-bar"><div class="progress-fill level-bar" id="level-bar"></div></div></div>
+                            <div class="stat-card"><div class="stat-label">Очки навыков</div><div class="stat-value skill-points" id="skill-points">0</div></div>
+                            <div class="stat-card"><div class="stat-label">Деньги</div><div class="stat-value money" id="money">100</div></div>
+                            <div class="stat-card"><div class="stat-label">Волна</div><div class="stat-value" id="current-wave">1</div></div>
+                            <div class="stat-card"><div class="stat-label">Прогресс волны</div><div class="stat-value" id="wave-progress-text-small">0/10</div><div class="progress-bar"><div class="progress-fill exp-bar" id="wave-bar"></div></div></div>
+                            <div class="stat-card"><div class="stat-label">Комбо</div><div class="stat-value" id="combo-display-text">x1.0</div></div>
+                            <div class="stat-card"><div class="stat-label">Урон</div><div class="stat-value" id="damage">10</div></div>
+                            <div class="stat-card"><div class="stat-label">Скорострельность</div><div class="stat-value" id="fire-rate">1.0/сек</div></div>
+                            <div class="stat-card"><div class="stat-label">Скорость пуль</div><div class="stat-value" id="bullet-speed">8</div></div>
+                            <div class="stat-card"><div class="stat-label">Скорость</div><div class="stat-value" id="movement-speed">5</div></div>
+                            <div class="stat-card"><div class="stat-label">Здоровье</div><div class="stat-value" id="player-health">100/100</div><div class="progress-bar"><div class="progress-fill health-bar" id="health-bar"></div></div></div>
+                            <div class="stat-card"><div class="stat-label">Регенерация</div><div class="stat-value" id="health-regen">0/сек</div></div>
+                            <div class="stat-card"><div class="stat-label">Опыт до оружия</div><div class="stat-value" id="exp">0/100</div><div class="progress-bar"><div class="progress-fill exp-bar" id="exp-bar"></div></div></div>
+                            <div class="stat-card"><div class="stat-label">Счёт</div><div class="stat-value" id="score">0</div></div>
+                            <div class="stat-card"><div class="stat-label">Убито</div><div class="stat-value" id="enemies-killed">0</div></div>
+                            <div class="stat-card wide"><div class="stat-label">Стоимость апгрейда</div><div class="stat-value" id="upgrade-cost">100 опыта + 50$</div></div>
+                        </div>
+                        <div class="controls-hint">
+                            <div class="hint-row"><kbd>WASD</kbd> движение</div>
+                            <div class="hint-row"><kbd>ЛКМ / Пробел</kbd> стрельба</div>
+                            <div class="hint-row"><kbd>Q</kbd> автострельба</div>
+                            <div class="hint-row"><kbd>Shift</kbd> ускорение</div>
+                            <div class="hint-row"><kbd>U</kbd> новое оружие</div>
+                            <div class="hint-row"><kbd>P / ESC</kbd> пауза</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Улучшения -->
+            <div id="modal-upgrades" class="modal hidden">
+                <div class="modal-box">
+                    <div class="modal-header">
+                        <span>УЛУЧШЕНИЯ</span>
+                        <button class="modal-close" data-modal="modal-upgrades">✕</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="upgrade-item">
+                            <div class="upgrade-header"><span class="upgrade-title">Урон</span><span class="upgrade-level">Ур. <span id="damage-level">1</span>/20</span></div>
+                            <div class="upgrade-description">+15% урон за уровень</div>
+                            <div class="stat-row"><button class="upgrade-btn" id="upgrade-damage-btn">Улучшить</button><span class="upgrade-cost" id="damage-cost">50$</span></div>
+                        </div>
+                        <div class="upgrade-item">
+                            <div class="upgrade-header"><span class="upgrade-title">Скорострельность</span><span class="upgrade-level">Ур. <span id="firerate-level">1</span>/20</span></div>
+                            <div class="upgrade-description">+8% скорострельность за уровень</div>
+                            <div class="stat-row"><button class="upgrade-btn" id="upgrade-firerate-btn">Улучшить</button><span class="upgrade-cost" id="firerate-cost">50$</span></div>
+                        </div>
+                        <div class="upgrade-item">
+                            <div class="upgrade-header"><span class="upgrade-title">Скорость пуль</span><span class="upgrade-level">Ур. <span id="bulletspeed-level">1</span>/15</span></div>
+                            <div class="upgrade-description">+12% скорость пуль за уровень</div>
+                            <div class="stat-row"><button class="upgrade-btn" id="upgrade-bulletspeed-btn">Улучшить</button><span class="upgrade-cost" id="bulletspeed-cost">50$</span></div>
+                        </div>
+                        <div class="upgrade-item">
+                            <div class="upgrade-header"><span class="upgrade-title">Размер пуль</span><span class="upgrade-level">Ур. <span id="bulletsize-level">1</span>/10</span></div>
+                            <div class="upgrade-description">+10% размер пуль за уровень</div>
+                            <div class="stat-row"><button class="upgrade-btn" id="upgrade-bulletsize-btn">Улучшить</button><span class="upgrade-cost" id="bulletsize-cost">75$</span></div>
+                        </div>
+                        <div class="upgrade-item">
+                            <div class="upgrade-header"><span class="upgrade-title">Отдача</span><span class="upgrade-level">Ур. <span id="recoil-level">1</span>/5</span></div>
+                            <div class="upgrade-description">-20% отдача за уровень</div>
+                            <div class="stat-row"><button class="upgrade-btn" id="upgrade-recoil-btn">Улучшить</button><span class="upgrade-cost" id="recoil-cost">100$</span></div>
+                        </div>
+                        <div class="modal-section-title">ЭВОЛЮЦИЯ ОРУЖИЯ</div>
+                        <div class="weapon-list">
+                            <div>1. 🏹 Лук</div><div>2. 🏹 Арбалет</div>
+                            <div>3. 🔫 Гладкоствольная</div><div>4. 🔫 Нарезная</div>
+                            <div>5. 🔫 WWI</div><div>6. 🔫 Современная</div>
+                            <div>7. 💥 Плазменная</div><div>8. ⚡ Электромагнитная</div>
+                        </div>
+                        <div class="stat-row" style="margin-top:12px">
+                            <button id="upgrade-weapon-btn" style="flex:1">Новое оружие (U)</button>
+                            <span class="upgrade-cost" id="upgrade-cost-modal" style="margin-left:10px"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Навыки -->
+            <div id="modal-skills" class="modal hidden">
+                <div class="modal-box">
+                    <div class="modal-header">
+                        <span>НАВЫКИ</span>
+                        <button class="modal-close" data-modal="modal-skills">✕</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="skill-points-display">Очки навыков: <span id="available-skill-points" class="skill-points">0</span></div>
+                        <div class="skill-item"><div class="skill-header"><span class="skill-title">Живучесть</span><span class="skill-level">Ур. <span id="vitality-level">0</span>/15</span></div><div class="skill-description">+30 здоровье за уровень</div><div class="skill-effect" id="vitality-effect">+0 к здоровью</div><div class="stat-row"><button class="skill-btn" id="upgrade-vitality-btn">Изучить (1)</button><span class="skill-cost" id="vitality-cost">1 очко</span></div></div>
+                        <div class="skill-item"><div class="skill-header"><span class="skill-title">Скорость</span><span class="skill-level">Ур. <span id="speed-level">0</span>/15</span></div><div class="skill-description">+0.8 скорость за уровень</div><div class="skill-effect" id="speed-effect">+0 к скорости</div><div class="stat-row"><button class="skill-btn" id="upgrade-speed-btn">Изучить (1)</button><span class="skill-cost" id="speed-cost">1 очко</span></div></div>
+                        <div class="skill-item"><div class="skill-header"><span class="skill-title">Регенерация</span><span class="skill-level">Ур. <span id="regen-level">0</span>/15</span></div><div class="skill-description">+0.8/сек регенерация</div><div class="skill-effect" id="regen-effect">+0/сек к регенерации</div><div class="stat-row"><button class="skill-btn" id="upgrade-regen-btn">Изучить (1)</button><span class="skill-cost" id="regen-cost">1 очко</span></div></div>
+                        <div class="skill-item"><div class="skill-header"><span class="skill-title">Критический удар</span><span class="skill-level">Ур. <span id="critical-level">0</span>/15</span></div><div class="skill-description">8% шанс тройного урона</div><div class="skill-effect" id="critical-effect">0% шанс крита</div><div class="stat-row"><button class="skill-btn" id="upgrade-critical-btn">Изучить (2)</button><span class="skill-cost" id="critical-cost">2 очка</span></div></div>
+                        <div class="skill-item"><div class="skill-header"><span class="skill-title">Жадность</span><span class="skill-level">Ур. <span id="greed-level">0</span>/15</span></div><div class="skill-description">+15% деньги за уровень</div><div class="skill-effect" id="greed-effect">+0% к деньгам</div><div class="stat-row"><button class="skill-btn" id="upgrade-greed-btn">Изучить (1)</button><span class="skill-cost" id="greed-cost">1 очко</span></div></div>
+                        <div class="skill-item"><div class="skill-header"><span class="skill-title">Удача</span><span class="skill-level">Ур. <span id="luck-level">0</span>/15</span></div><div class="skill-description">8% шанс бонусного опыта</div><div class="skill-effect" id="luck-effect">0% шанс бонуса</div><div class="stat-row"><button class="skill-btn" id="upgrade-luck-btn">Изучить (2)</button><span class="skill-cost" id="luck-cost">2 очка</span></div></div>
+                        <div class="skill-item"><div class="skill-header"><span class="skill-title">Комбо мастер</span><span class="skill-level">Ур. <span id="combo-level">0</span>/10</span></div><div class="skill-description">+0.8 сек к времени комбо</div><div class="skill-effect" id="combo-effect">+0 сек к комбо</div><div class="stat-row"><button class="skill-btn" id="upgrade-combo-btn">Изучить (3)</button><span class="skill-cost" id="combo-cost">3 очка</span></div></div>
+                        <div class="skill-item"><div class="skill-header"><span class="skill-title">Щит</span><span class="skill-level">Ур. <span id="shield-level">0</span>/5</span></div><div class="skill-description">10% шанс блока урона</div><div class="skill-effect" id="shield-effect">0% шанс блока</div><div class="stat-row"><button class="skill-btn" id="upgrade-shield-btn">Изучить (3)</button><span class="skill-cost" id="shield-cost">3 очка</span></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Миссии -->
+            <div id="modal-missions" class="modal hidden">
+                <div class="modal-box">
+                    <div class="modal-header">
+                        <span>МИССИИ</span>
+                        <button class="modal-close" data-modal="modal-missions">✕</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="skill-points-display">Выполнено: <span id="missions-completed">0/10</span></div>
+                        <div id="missions-list"></div>
+                        <div class="modal-section-title">ДОСТИЖЕНИЯ</div>
+                        <div id="achievements-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Over -->
+            <div id="game-over" class="hidden">
+                <div class="end-card">
+                    <h2>ИГРА ОКОНЧЕНА</h2>
+                    <p id="final-score">Счёт: 0</p>
+                    <p id="final-money">Заработано: 0$</p>
+                    <p id="final-level">Уровень: 1</p>
+                    <p id="waves-completed">Волн пройдено: 0</p>
+                    <p id="game-mode-result">Режим: Нормальный</p>
+                    <div class="end-divider"></div>
+                    <div class="end-actions">
+                        <button class="end-btn primary" id="restart-button">↺ ЗАНОВО</button>
+                        <button class="end-btn secondary" id="change-mode-button">⌂ МЕНЮ</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Win -->
+            <div id="game-win" class="hidden">
+                <div class="end-card">
+                    <h2>ПОБЕДА!</h2>
+                    <p id="win-score">Счёт: 0</p>
+                    <p id="win-money">Заработано: 0$</p>
+                    <p id="win-level">Уровень: 1</p>
+                    <p id="win-waves">Волн пройдено: 0</p>
+                    <p id="win-mode">Режим: Нормальный</p>
+                    <div class="end-divider"></div>
+                    <div class="end-actions">
+                        <button class="end-btn primary" id="continue-button">▶ ПРОДОЛЖИТЬ</button>
+                        <button class="end-btn primary" id="new-game-btn">↺ ЗАНОВО</button>
+                        <button class="end-btn secondary" id="win-change-mode">⌂ МЕНЮ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Нижняя панель скрыта, кнопки управления убраны -->
+        <div id="controls" style="display:none">
+            <button id="fullscreen-btn">F11</button>
+            <button id="shoot-btn">Стрелять</button>
+            <button id="auto-shoot-btn">Автострельба (Q)</button>
+            <button id="upgrade-weapon-btn-ctrl">Оружие (U)</button>
+            <button id="pause-btn">Пауза (P)</button>
+            <button id="activate-rapid-btn">Ускорение (SHIFT)</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
