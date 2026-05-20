@@ -2379,6 +2379,13 @@ document.querySelectorAll('.settings-tab').forEach(tab => {
     });
 });
 
+const toggleAutoshootBtn = document.getElementById('toggle-autoshoot');
+toggleAutoshootBtn.addEventListener('click', () => {
+    autoShootActive = !autoShootActive;
+    toggleAutoshootBtn.textContent = autoShootActive ? 'ВКЛ' : 'ВЫКЛ';
+    toggleAutoshootBtn.classList.toggle('active', autoShootActive);
+});
+
 let showCombo = true;
 const toggleComboBtn = document.getElementById('toggle-combo');
 toggleComboBtn.addEventListener('click', () => {
