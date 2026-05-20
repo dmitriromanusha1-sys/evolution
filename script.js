@@ -75,6 +75,7 @@ let mouseY = 0;
 let mouseDown = false;
 
 // Автострельба
+let autoShootEnabled = false;
 let autoShootActive = false;
 let autoShootButton = null;
 
@@ -2044,7 +2045,7 @@ function restartGame() {
     comboMultiplier = 1.0;
     lastKillTime = 0;
     
-    autoShootActive = false;
+    autoShootActive = autoShootEnabled;
     rapidFireActive = true;
     rapidFireTimer = 0;
     
@@ -2381,9 +2382,10 @@ document.querySelectorAll('.settings-tab').forEach(tab => {
 
 const toggleAutoshootBtn = document.getElementById('toggle-autoshoot');
 toggleAutoshootBtn.addEventListener('click', () => {
-    autoShootActive = !autoShootActive;
-    toggleAutoshootBtn.textContent = autoShootActive ? 'ВКЛ' : 'ВЫКЛ';
-    toggleAutoshootBtn.classList.toggle('active', autoShootActive);
+    autoShootEnabled = !autoShootEnabled;
+    autoShootActive = autoShootEnabled;
+    toggleAutoshootBtn.textContent = autoShootEnabled ? 'ВКЛ' : 'ВЫКЛ';
+    toggleAutoshootBtn.classList.toggle('active', autoShootEnabled);
 });
 
 let showCombo = true;
