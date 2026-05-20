@@ -60,10 +60,11 @@ const enemySprites = [];
 
 // Режимы игры
 const GAME_MODES = {
-    NORMAL: { name: "Нормальный", enemyMultiplier: 1.0, rewardMultiplier: 1.0, bossEvery: 5 },
-    HARD: { name: "Сложный", enemyMultiplier: 1.5, rewardMultiplier: 0.7, bossEvery: 3 },
-    ENDLESS: { name: "Бесконечный", enemyMultiplier: 1.2, rewardMultiplier: 0.8, bossEvery: 10 },
-    BOSS_RUSH: { name: "Босс Руш", enemyMultiplier: 2.0, rewardMultiplier: 2.0, bossEvery: 1 }
+    NORMAL:   { name: "Нормальный", enemyMultiplier: 1.0, rewardMultiplier: 1.0, bossEvery: 5, hardcore: false },
+    HARD:     { name: "Сложный",    enemyMultiplier: 1.5, rewardMultiplier: 0.7, bossEvery: 3, hardcore: false },
+    HARDCORE: { name: "Хардкор",    enemyMultiplier: 1.2, rewardMultiplier: 1.0, bossEvery: 5, hardcore: true,
+                hpMult: 1.2, damageMult: 1.25, speedMult: 1.1 },
+    BOSS_RUSH:{ name: "Босс Руш",   enemyMultiplier: 2.0, rewardMultiplier: 2.0, bossEvery: 1, hardcore: false }
 };
 
 let currentGameMode = GAME_MODES.NORMAL;
@@ -720,9 +721,9 @@ function completeWave() {
 function startNextWave() {
     currentWave++;
 
-    if (currentGameMode === GAME_MODES.ENDLESS) {
-        enemiesInWave = 12 + Math.floor(currentWave * 2.5);
-        enemySpawnRate = Math.max(150, 900 - currentWave * 60);
+    if (currentGameMode === GAME_MODES.HARDCORE) {
+        enemiesInWave = 10 + currentWave * 2;
+        enemySpawnRate = Math.max(200, 1000 - currentWave * 50);
     } else {
         enemiesInWave = 10 + currentWave * 2;
         enemySpawnRate = Math.max(200, 1000 - currentWave * 50);
@@ -732,7 +733,7 @@ function startNextWave() {
     waveReward = 100 + currentWave * 50;
     waveActive = true;
 
-    const bossEvery = currentGameMode === GAME_MODES.ENDLESS ? 3 : 5;
+    const bossEvery = currentGameMode.bossEvery || 5;
     if (currentWave % bossEvery === 0) {
         enemiesInWave++;
         bossWarning = 5000;
@@ -744,7 +745,7 @@ function startNextWave() {
 
     updateWaveProgress();
 
-    const modeTag = currentGameMode === GAME_MODES.ENDLESS ? ' [∞]' : '';
+    const modeTag = currentGameMode === GAME_MODES.HARDCORE ? ' [💀]' : '';
     showNotification(`Волна ${currentWave}${modeTag}! Убейте ${enemiesInWave} врагов`, "info");
 }
 
@@ -1100,8 +1101,10 @@ function spawnEnemy() {
         case 3: x = -size; y = Math.random() * gameHeight; break;
     }
 
+    const hcHp    = currentGameMode.hardcore ? currentGameMode.hpMult    : 1;
+    const hcSpeed = currentGameMode.hardcore ? currentGameMode.speedMult : 1;
     const baseHealth = 20 + currentWeaponIndex * 15 + currentWave * 5;
-    const health = Math.floor(baseHealth * type.healthMultiplier * currentGameMode.enemyMultiplier + Math.random() * 20);
+    const health = Math.floor(baseHealth * type.healthMultiplier * currentGameMode.enemyMultiplier * hcHp + Math.random() * 20);
 
     let enemyMoney = 5 + currentWeaponIndex * 3 + currentWave * 2;
     enemyMoney = Math.floor(enemyMoney * type.moneyMultiplier * currentGameMode.rewardMultiplier);
@@ -1112,7 +1115,7 @@ function spawnEnemy() {
         x, y,
         width: size,
         height: size,
-        speed: (0.5 + Math.random() * 0.5) * type.speedMultiplier,
+        speed: (0.5 + Math.random() * 0.5) * type.speedMultiplier * hcSpeed,
         health,
         maxHealth: health,
         money: enemyMoney,
@@ -1301,24 +1304,61 @@ function update() {
         enemy.attackCooldown -= 16;
         enemy.healCooldown = (enemy.healCooldown || 0) - 16;
 
-        // === БОСС: спираль пуль ===
+        // === БОСС: атаки ===
         if (enemy.isBoss) {
+            if (!enemy.bossPhase) enemy.bossPhase = 0;
+            if (!enemy.bossAngle) enemy.bossAngle = 0;
+            const baseDmg = 10 + currentWave;
+            const hcDmg = currentGameMode.hardcore ? currentGameMode.damageMult : 1;
+
             if (enemy.attackCooldown <= 0) {
-                const bulletCount = 8;
-                for (let j = 0; j < bulletCount; j++) {
-                    const angle = (Math.PI * 2 / bulletCount) * j;
-                    bullets.push({
-                        x: ex, y: ey,
-                        width: 10, height: 10,
-                        speedX: Math.cos(angle) * 2.5,
-                        speedY: Math.sin(angle) * 2.5,
-                        damage: 10 + currentWave,
-                        color: '#ff4400',
-                        isCritical: false,
-                        isEnemyBullet: true
-                    });
+                if (!currentGameMode.hardcore) {
+                    // Обычный режим: 8 радиальных пуль
+                    for (let j = 0; j < 8; j++) {
+                        const angle = (Math.PI * 2 / 8) * j;
+                        bullets.push({ x: ex, y: ey, width: 10, height: 10,
+                            speedX: Math.cos(angle) * 2.5, speedY: Math.sin(angle) * 2.5,
+                            damage: baseDmg, color: '#ff4400', isCritical: false, isEnemyBullet: true });
+                    }
+                    enemy.attackCooldown = 2200;
+                } else {
+                    // Хардкор: чередует 3 паттерна
+                    const phase = enemy.bossPhase % 3;
+                    if (phase === 0) {
+                        // Вращающаяся спираль: 12 пуль с накопленным углом
+                        for (let j = 0; j < 12; j++) {
+                            const angle = enemy.bossAngle + (Math.PI * 2 / 12) * j;
+                            bullets.push({ x: ex, y: ey, width: 10, height: 10,
+                                speedX: Math.cos(angle) * 3, speedY: Math.sin(angle) * 3,
+                                damage: baseDmg * hcDmg, color: '#ff2200', isCritical: false, isEnemyBullet: true });
+                        }
+                        enemy.bossAngle += 0.35;
+                        enemy.attackCooldown = 1600;
+                    } else if (phase === 1) {
+                        // Прицельный залп 5 пуль веером в игрока
+                        const aimAngle = Math.atan2(dy, dx);
+                        for (let j = -2; j <= 2; j++) {
+                            const angle = aimAngle + j * 0.18;
+                            bullets.push({ x: ex, y: ey, width: 12, height: 12,
+                                speedX: Math.cos(angle) * 4, speedY: Math.sin(angle) * 4,
+                                damage: baseDmg * hcDmg * 1.4, color: '#ff8800', isCritical: false, isEnemyBullet: true });
+                        }
+                        enemy.attackCooldown = 1800;
+                    } else {
+                        // Крестообразная волна: 4 направления по 3 пули
+                        for (let dir = 0; dir < 4; dir++) {
+                            const baseA = (Math.PI / 2) * dir;
+                            for (let k = 0; k < 3; k++) {
+                                const spd = 2 + k * 1.2;
+                                bullets.push({ x: ex, y: ey, width: 9, height: 9,
+                                    speedX: Math.cos(baseA) * spd, speedY: Math.sin(baseA) * spd,
+                                    damage: baseDmg * hcDmg * 0.9, color: '#cc00ff', isCritical: false, isEnemyBullet: true });
+                            }
+                        }
+                        enemy.attackCooldown = 2000;
+                    }
+                    enemy.bossPhase++;
                 }
-                enemy.attackCooldown = 2200;
             }
         }
 
@@ -1400,6 +1440,7 @@ function update() {
                 let damage = 5 + currentWeaponIndex * 2;
                 if (enemy.type === 2) damage *= 2;  // Танк
                 if (enemy.isBoss) damage *= 1.5;
+                if (currentGameMode.hardcore) damage *= currentGameMode.damageMult;
 
                 const blockChance = playerSkills.shield.level * 10;
                 if (Math.random() * 100 >= blockChance) {
@@ -1609,7 +1650,7 @@ function killEnemy(enemy, bullet) {
     }
     
     // Победа только в нормальном режиме
-    if (currentGameMode !== GAME_MODES.ENDLESS &&
+    if (currentGameMode !== GAME_MODES.HARDCORE &&
         currentWeaponIndex === weapons.length - 1 && enemiesKilled >= 100 && !winShown) {
         winShown = true;
         gameWin = true;
@@ -2294,7 +2335,7 @@ document.getElementById('mode-normal-btn').addEventListener('click', () => {
 });
 
 document.getElementById('mode-endless-btn').addEventListener('click', () => {
-    currentGameMode = GAME_MODES.ENDLESS;
+    currentGameMode = GAME_MODES.HARDCORE;
     document.getElementById('mode-select-screen').style.display = 'none';
     document.getElementById('tutorial-screen').style.display = 'flex';
 });
