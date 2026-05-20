@@ -2242,10 +2242,7 @@ function openPauseModal(modalId) {
     openModal(modalId);
 }
 
-document.getElementById('qbtn-stats').addEventListener('click', () => openPauseModal('modal-stats'));
-document.getElementById('qbtn-upgrades').addEventListener('click', () => openPauseModal('modal-upgrades'));
-document.getElementById('qbtn-skills').addEventListener('click', () => openPauseModal('modal-skills'));
-document.getElementById('qbtn-missions').addEventListener('click', () => openPauseModal('modal-missions'));
+document.getElementById('qbtn-menu').addEventListener('click', () => openPauseModal('modal-stats'));
 
 // Обработчики кнопок
 document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
