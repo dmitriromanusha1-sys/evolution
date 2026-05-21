@@ -1525,8 +1525,6 @@ function upgradeWeapon() {
         document.getElementById('weapon-icon').classList.remove('level-up');
     }, 500);
     
-    activateRapidFire();
-    
     showNotification(`Оружие улучшено до ${currentWeapon.name}!`, "success");
     
     if (currentWeaponIndex === weapons.length - 1) {
@@ -2139,9 +2137,6 @@ window.addEventListener('keydown', (e) => {
         updateStats();
     }
 
-    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
-        if (!gameOver && !gameWin && !gamePaused) activateRapidFire();
-    }
 
 
     if (e.key === 'F11') {
