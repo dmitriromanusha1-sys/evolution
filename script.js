@@ -1219,6 +1219,7 @@ function update() {
                             achievementCounters.bossesKilled++;
                             if (achievementCounters.bossesKilled >= 10) unlockAchievement('bossSlayer');
                         }
+                        enemies.splice(j, 1);
                     }
                     continue;
                 }
